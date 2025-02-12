@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yudao.lianying.v1.term.dao.mapper.EntryMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.yudao.lianying.v1.term.dao.Entry">
+        <id column="id" property="id"/>
+        <result column="status" property="status"/>
+        <result column="tb_guid" property="tbGuid"/>
+        <result column="field" property="field"/>
+        <result column="applicable_to" property="applicableTo"/>
+        <result column="field_name" property="fieldName"/>
+        <result column="applicable_to_name" property="applicableToName"/>
+        <result column="category_id" property="categoryId"/>
+        <result column="category_name" property="categoryName"/>
+        <result column="part_of_speech" property="partOfSpeech"/>
+        <result column="part_of_speech_name" property="partOfSpeechName"/>
+        <result column="note" property="note"/>
+        <result column="image" property="image"/>
+        <result column="image_caption" property="imageCaption"/>
+        <result column="created" property="created"/>
+        <result column="creator" property="creator"/>
+        <result column="modified" property="modified"/>
+        <result column="modifier" property="modifier"/>
+        <result column="custom_field_value" property="customFieldValue"/>
+    </resultMap>
+
+    <resultMap id="DTOResultMap" type="com.yudao.lianying.v1.term.dto.EntryDTO">
+        <id column="id" property="id"/>
+        <result column="status" property="status"/>
+        <result column="tb_guid" property="tbGuid"/>
+        <result column="tb_name" property="tbName"/>
+        <result column="field" property="field"/>
+        <result column="applicable_to" property="applicableTo"/>
+        <result column="field_name" property="fieldName"/>
+        <result column="applicable_to_name" property="applicableToName"/>
+        <result column="category_id" property="categoryId"/>
+        <result column="category_name" property="categoryName"/>
+        <result column="part_of_speech" property="partOfSpeech"/>
+        <result column="part_of_speech_name" property="partOfSpeechName"/>
+        <result column="note" property="note"/>
+        <result column="image" property="image"/>
+        <result column="image_caption" property="imageCaption"/>
+        <result column="created" property="created"/>
+        <result column="creator" property="creator"/>
+        <result column="modified" property="modified"/>
+        <result column="modifier" property="modifier"/>
+        <result column="custom_field_value" property="customFieldValue"/>
+    </resultMap>
+
+
+    <!--字段名要用\$，字段值用#，两个方法都行-->
+    <update id="modifyByIdAuto">
+        update term_entry set
+        <foreach collection="modifyFieldNameArray" item="moidfyFieldName" separator="," index="index">
+            ${moidfyFieldName}= #{modifyFieldValueArray[${index}]}
+        </foreach>
+        where id in
+        <foreach collection="idList" index="index" item="id" separator="," open="(" close=")">
+            #{id}
+        </foreach>
+    </update>
+    <select id="searchAccurate" resultType="com.yudao.lianying.v1.term.dto.EntrySearchResult">
+        select tel.entry_id 'entryId', a.text 'content' from term_item a
+        left join term_entry_lang tel on tel.id=a.term_entry_lang_id
+        left join term_entry te on te.id=tel.entry_id
+        left join t_termbase tb on tb.id=te.tb_guid
+        where a.status='T' and tel.status='T' and te.status='T' and tb.status='T' and tb.state='1'
+        and a.text=#{keyword}
+        <if test="fieldList.size() > 0">
+            and
+            <foreach collection="fieldList" index="index" item="field" separator="or" open="(" close=")">
+                FIND_IN_SET(#{field}, te.field) != 0
+            </foreach>
+        </if>
+        <if test="applicableToList.size() > 0">
+            and
+            <foreach collection="applicableToList" index="index" item="applicableTo" separator="or" open="(" close=")">
+                FIND_IN_SET(#{applicableTo}, te.applicable_to) != 0
+            </foreach>
+        </if>
+    </select>
+    <select id="searchContain" resultType="com.yudao.lianying.v1.term.dto.EntrySearchResult">
+        select tel.entry_id 'entryId', a.text 'content' from term_item a
+        left join term_entry_lang tel on tel.id=a.term_entry_lang_id
+        left join term_entry te on te.id=tel.entry_id
+        left join t_termbase tb on tb.id=te.tb_guid
+        where a.status='T'  and tel.status='T' and te.status='T' and tb.status='T' and tb.state='1'
+        and a.text like '%${keyword}%'
+        <if test="fieldList.size() > 0">
+            and
+            <foreach collection="fieldList" index="index" item="field" separator="or" open="(" close=")">
+                FIND_IN_SET(#{field}, te.field) != 0
+            </foreach>
+        </if>
+        <if test="applicableToList.size() > 0">
+            and
+            <foreach collection="applicableToList" index="index" item="applicableTo" separator="or" open="(" close=")">
+                FIND_IN_SET(#{applicableTo}, te.applicable_to) != 0
+            </foreach>
+        </if>
+    </select>
+    <select id="page4Manage" resultType="com.yudao.lianying.v1.term.dto.EntryViewResult">
+        select t1.entry_id 'entryId',t1.text 'firstLangContent',t2.text 'secondLangContent' from
+        (
+        SELECT tel.entry_id, tel.language_id,GROUP_CONCAT( DISTINCT ti.text ORDER BY ti.text SEPARATOR ';' ) 'text'
+        ,max(te.created) 'create_time',max(te.field) 'field'
+        from term_entry_lang tel
+        left join term_entry te on te.id=tel.entry_id
+        left join term_item ti on ti.term_entry_lang_id=tel.id
+        where (tel.language_id=#{firstLang} and te.tb_guid=#{tbId}) and te.status='T'
+        GROUP BY tel.entry_id, tel.language_id ) t1
+        left join (
+        SELECT tel.entry_id, tel.language_id,GROUP_CONCAT( DISTINCT ti.text ORDER BY ti.text SEPARATOR ';' ) 'text'
+        from term_entry_lang tel
+        left join term_entry te on te.id=tel.entry_id
+        left join term_item ti on ti.term_entry_lang_id=tel.id
+        where (tel.language_id=#{secondLang} and te.tb_guid=#{tbId}) and te.status='T'
+        GROUP BY tel.entry_id, tel.language_id
+        ) t2 on t1.entry_id=t2.entry_id
+        where 1=1
+        <if test="keyword != ''">
+            and (t1.text like '%${keyword}%' or t2.text like '%${keyword}%')
+        </if>
+        <if test="fieldList.size() > 0">
+            and
+            <foreach collection="fieldList" index="index" item="field" separator="or" open="(" close=")">
+                FIND_IN_SET(#{field}, t1.field) != 0
+            </foreach>
+        </if>
+        <if test="beginTime != null">
+            and t1.create_time &gt;= #{beginTime}
+        </if>
+        <if test="endTime != null">
+            and t1.create_time &lt; #{endTime}
+        </if>
+
+    </select>
+
+    <select id="getTermTextList" resultType="java.lang.String">
+    SELECT text from term_item where term_entry_lang_id in
+    (SELECT id from term_entry_lang where entry_id=#{id})
+    </select>
+    <select id="getById" resultMap="DTOResultMap">
+        select a.*,b.Name 'tb_name'
+        from term_entry a
+        left join t_termbase b on b.id=a.tb_guid
+        where a.id=#{id}
+    </select>
+
+    <update id="updateTBId">
+        update term_entry set tb_guid=#{mainId} where tb_guid in
+        <foreach collection="slaveIdList" item="slaveId" open="(" close=")" separator=",">
+            #{slaveId}
+        </foreach>
+    </update>
+
+    <update id="moveTo">
+        update term_entry set tb_guid=#{newTBId} where id in
+        <foreach collection="entryIdList" item="entryId" open="(" close=")" separator=",">
+            #{entryId}
+        </foreach>
+    </update>
+
+</mapper>

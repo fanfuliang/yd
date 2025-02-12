@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yudao.lianying.v1.term.dao.mapper.TermbaseMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.yudao.lianying.v1.term.dao.Termbase">
+        <id column="id" property="id"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="create_by" property="createBy"/>
+        <result column="update_by" property="updateBy"/>
+        <result column="status" property="status"/>
+        <result column="client" property="client"/>
+        <result column="domain" property="domain"/>
+        <result column="project" property="project"/>
+        <result column="subject" property="subject"/>
+        <result column="friendly_name" property="friendlyName"/>
+        <result column="is_used_in_project" property="isUsedInProject"/>
+        <result column="name" property="name"/>
+        <result column="code" property="code"/>
+        <result column="local_id" property="localId"/>
+        <result column="description" property="description"/>
+        <result column="state" property="state"/>
+        <result column="tag" property="tag"/>
+        <result column="remark" property="remark"/>
+        <result column="custom_field" property="customField"/>
+    </resultMap>
+    <resultMap id="TermbaseDTOMap" type="com.yudao.lianying.v1.term.dto.TermbaseDTO">
+        <id column="id" property="id"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="create_by" property="createBy"/>
+        <result column="update_by" property="updateBy"/>
+        <result column="status" property="status"/>
+        <result column="client" property="client"/>
+        <result column="domain" property="domain"/>
+        <result column="project" property="project"/>
+        <result column="subject" property="subject"/>
+        <result column="friendly_name" property="friendlyName"/>
+        <result column="is_used_in_project" property="isUsedInProject"/>
+        <result column="name" property="name"/>
+        <result column="code" property="code"/>
+        <result column="local_id" property="localId"/>
+        <result column="description" property="description"/>
+        <result column="state" property="state"/>
+        <result column="tag" property="tag"/>
+        <result column="remark" property="remark"/>
+        <result column="custom_field" property="customField"/>
+        <result column="numEntries" property="numEntries"/>
+        <result column="creator" property="creator"/>
+        <result column="modifier" property="modifier"/>
+        <collection property="localObjectList" javaType="List" column="local_id"
+                    select="com.yudao.lianying.v1.basicConfig.dao.mapper.LanguageMapper.selectListByIds"/>
+    </resultMap>
+
+    <resultMap id="UihTermDTOMap" type="com.yudao.lianying.v1.term.dto.UihTermDTO">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+    </resultMap>
+
+    <select id="getUihTermList" resultMap="UihTermDTOMap">
+        select a.id,a.name 'name'
+        from t_termbase a
+        where a.status = 'T'
+    </select>
+
+
+    <!--字段名要用\$，字段值用#，两个方法都行-->
+    <update id="modifyBatchByIdAuto">
+        <foreach collection="modifyVOList" item="modifyVO" separator=";">
+            update t_termbase set
+            <foreach collection="modifyVO.nameList" item="moidfyFieldName" separator="," index="index">
+                ${moidfyFieldName}= #{modifyVO.valueList[${index}]}
+            </foreach>
+            where id = #{modifyVO.id}
+        </foreach>
+    </update>
+    <update id="updateLocalId">
+        update t_termbase set local_id=#{newlocalId} where id=#{id}
+    </update>
+
+    <select id="page2" resultMap="TermbaseDTOMap">
+        select a.*, b.login_name 'creator',c.login_name 'modifier',IFNULL(tmp.numEntries,0) 'numEntries'
+        from t_termbase a
+        left join account b on a.create_by = b.id and b.status = 'T'
+        left join account c on a.update_by = c.id and c.status = 'T'
+        left join  (select tb_guid 'tbId',count(*) 'numEntries' from term_entry where status='T' group by tb_guid) tmp on tmp.tbId=a.id
+        where a.status = 'T'
+        <if test="whereLike != null">
+            and
+            <foreach collection="whereLike.names" index="i" item="name" separator="or" open="(" close=")">
+                ${name} like '%${whereLike.value}%'
+            </foreach>
+        </if>
+        <if test="whereInList.size() > 0">
+            and
+            <foreach collection="whereInList" index="i" item="item" separator="and" open="(" close=")">
+                ${item.name} in
+                <foreach collection="item.values" index="j" item="value" separator="," open="(" close=")">
+                    #{value}
+                </foreach>
+            </foreach>
+        </if>
+        <if test="whereEqualsList.size() > 0">
+            and
+            <foreach collection="whereEqualsList" index="i" item="item" separator="and" open="(" close=")">
+                ${item.name} &lt;=&gt; #{item.value}
+            </foreach>
+        </if>
+        <if test="beginTime != null">
+            and a.create_time &gt;= #{beginTime}
+        </if>
+        <if test="endTime != null">
+            and a.create_time &lt; #{endTime}
+        </if>
+        order by
+        <foreach collection="orderByList" index="i" item="orderBy">
+            ${orderBy},
+        </foreach>
+        a.create_time desc
+    </select>
+
+    <select id="page" resultMap="TermbaseDTOMap">
+        select a.*, b.login_name 'creator',c.login_name 'modifier',IFNULL(tmp.numEntries,0) 'numEntries'
+        from t_termbase a
+        left join account b on a.create_by = b.id and b.status = 'T'
+        left join account c on a.update_by = c.id and c.status = 'T'
+        left join  (select tb_guid 'tbId',count(*) 'numEntries' from term_entry where status='T' group by tb_guid) tmp on tmp.tbId=a.id
+        where a.status = 'T'
+        <if test="accountId != null">
+            and a.create_by=#{accountId}
+        </if>
+        <if test="keyword != ''">
+            and a.name like '%${keyword}%'
+        </if>
+        <if test="filterFieldNameArray.length > 0">
+            and
+            <foreach collection="filterFieldNameArray" index="index" item="filterFieldName" separator="and" open="("
+                     close=")">
+                ${filterFieldName} in (${filterFieldValueArray[index]})
+            </foreach>
+        </if>
+        <if test="localIdList.size() > 0">
+            and
+            <foreach collection="localIdList" index="index" item="localId" separator="or" open="(" close=")">
+                FIND_IN_SET(#{localId}, local_id) != 0
+            </foreach>
+        </if>
+        <if test="beginTime != null">
+            and a.create_time &gt;= #{beginTime}
+        </if>
+        <if test="endTime != null">
+            and a.create_time &lt; #{endTime}
+        </if>
+        <if test="tags.size() > 0">
+            and
+            <foreach collection="tags" index="index" item="tag" separator="or" open="(" close=")">
+                FIND_IN_SET(#{tag}, a.tag) != 0
+            </foreach>
+        </if>
+        <if test="orderBy != ''">
+            order by ${orderBy}, a.create_time desc
+        </if>
+        <if test="orderBy == ''">
+            order by a.create_time desc
+        </if>
+    </select>
+    <select id="getById" resultMap="TermbaseDTOMap">
+        select  a.*,b.login_name 'creator',c.login_name 'modifier'
+        from t_termbase a
+        left join account b on a.create_by = b.id and b.status = 'T'
+        left join account c on a.update_by = c.id and c.status = 'T'
+        where a.status = 'T' and a.id = #{1}
+    </select>
+
+</mapper>

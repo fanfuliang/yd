@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yudao.lianying.v1.term.dao.mapper.EntryCommentMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.yudao.lianying.v1.term.dao.EntryComment">
+        <id column="id" property="id"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="create_by" property="createBy"/>
+        <result column="update_by" property="updateBy"/>
+        <result column="status" property="status"/>
+        <result column="photo" property="photo"/>
+        <result column="content" property="content"/>
+        <result column="entry_id" property="entryId"/>
+        <result column="root_id" property="rootId"/>
+        <result column="parent_id" property="parentId"/>
+    </resultMap>
+
+    <resultMap id="EntryCommentDTOMap" type="com.yudao.lianying.v1.term.dto.EntryCommentDTO">
+        <id column="id" property="id"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="create_by" property="createBy"/>
+        <result column="update_by" property="updateBy"/>
+        <result column="status" property="status"/>
+        <result column="photo" property="photo"/>
+        <result column="content" property="content"/>
+        <result column="entry_id" property="entryId"/>
+        <result column="root_id" property="rootId"/>
+        <result column="parent_id" property="parentId"/>
+        <result column="child_count" property="childCount"/>
+    </resultMap>
+
+
+    <!--字段名要用\$，字段值用#，两个方法都行-->
+    <update id="modifyBatchByIdAuto">
+        <foreach collection="modifyVOList" item="modifyVO" separator=";">
+            update term_entry_comment set
+            <foreach collection="modifyVO.nameList" item="moidfyFieldName" separator="," index="index">
+                ${moidfyFieldName}= #{modifyVO.valueList[${index}]}
+            </foreach>
+            where id = #{modifyVO.id}
+        </foreach>
+    </update>
+
+    <select id="page" resultMap="EntryCommentDTOMap">
+        select a.*,IFNULL(b.child_count,0)'child_count'
+        from term_entry_comment a
+        left join (select root_id,count(*) child_count from term_entry_comment group by root_id ) b on b.root_id=a.id
+        where a.status = 'T' and (a.root_id='' or a.root_id is null)
+        <if test="keyword != ''">
+            and a.content like '%${keyword}%'
+        </if>
+        <if test="filterFieldNameArray.length > 0">
+            and
+            <foreach collection="filterFieldNameArray" index="index" item="filterFieldName" separator="and" open="("
+                     close=")">
+                a.${filterFieldName} in (${filterFieldValueArray[index]})
+            </foreach>
+        </if>
+        <if test="beginTime != null">
+            and a.create_time &gt;= #{beginTime}
+        </if>
+        <if test="endTime != null">
+            and a.create_time &lt; #{endTime}
+        </if>
+        <if test="orderBy != ''">
+            order by ${orderBy}, a.create_time desc
+        </if>
+        <if test="orderBy == ''">
+            order by a.create_time desc
+        </if>
+    </select>
+
+    <select id="pageChildren" resultMap="BaseResultMap">
+      SELECT a.*  from term_entry_comment a
+      where  a.status = 'T' and a.root_id=#{rootId} and a.id != #{rootId}
+        <if test="orderBy != ''">
+            order by ${orderBy}, a.create_time desc
+        </if>
+        <if test="orderBy == ''">
+            order by a.create_time desc
+        </if>
+    </select>
+
+</mapper>

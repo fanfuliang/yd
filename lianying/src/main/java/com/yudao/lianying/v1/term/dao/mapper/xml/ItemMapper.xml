@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yudao.lianying.v1.term.dao.mapper.ItemMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.yudao.lianying.v1.term.dao.Item">
+        <id column="id" property="id"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="create_by" property="createBy"/>
+        <result column="update_by" property="updateBy"/>
+        <result column="status" property="status"/>
+        <result column="term_entry_lang_id" property="termEntryLangId"/>
+        <result column="example" property="example"/>
+        <result column="for_doc" property="forDoc"/>
+        <result column="text" property="text"/>
+        <result column="tag" property="tag"/>
+        <result column="multi_trans" property="multiTrans"/>
+        <result column="case_sensitivity" property="caseSensitivity"/>
+        <result column="matching" property="matching"/>
+        <result column="forbidden" property="forbidden"/>
+    </resultMap>
+
+    <resultMap id="ItemDTOMap" type="com.yudao.lianying.v1.term.dto.ItemDTO">
+        <id column="id" property="id"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="create_by" property="createBy"/>
+        <result column="update_by" property="updateBy"/>
+        <result column="status" property="status"/>
+        <result column="term_entry_lang_id" property="termEntryLangId"/>
+        <result column="example" property="example"/>
+        <result column="for_doc" property="forDoc"/>
+        <result column="text" property="text"/>
+        <result column="entry_id" property="entryId"/>
+        <result column="tag" property="tag"/>
+        <result column="multi_trans" property="multiTrans"/>
+        <result column="case_sensitivity" property="caseSensitivity"/>
+        <result column="matching" property="matching"/>
+        <result column="forbidden" property="forbidden"/>
+    </resultMap>
+
+
+    <!--字段名要用\$，字段值用#，两个方法都行-->
+    <update id="modifyByIdAuto">
+        update term_item set
+        <foreach collection="modifyFieldNameArray" item="moidfyFieldName" separator="," index="index">
+            ${moidfyFieldName}= #{modifyFieldValueArray[${index}]}
+        </foreach>
+        where id in
+        <foreach collection="idList" index="index" item="id" separator="," open="(" close=")">
+            #{id}
+        </foreach>
+    </update>
+
+    <select id="pageByLetter" resultMap="ItemDTOMap">
+        SELECT  a.*,tel.entry_id from term_item  a
+        LEFT JOIN term_entry_lang tel on tel.id=a.term_entry_lang_id
+        LEFT JOIN term_entry te on te.id=tel.entry_id
+        LEFT JOIN t_termbase tb on tb.id=te.tb_guid
+        where a.status='T' and tel.status='T' and te.status='T'and tb.status='T' and tb.state='1' and tel.language_id=0
+        <if test="letter != ''">
+          and  LOWER(left(a.text,1)) = LOWER(#{letter})
+        </if>
+        <if test="fieldList.size() > 0">
+            and
+            <foreach collection="fieldList" index="index" item="field" separator="or" open="(" close=")">
+                FIND_IN_SET(#{field}, te.field) != 0
+            </foreach>
+        </if>
+        <if test="applicableToList.size() > 0">
+            and
+            <foreach collection="applicableToList" index="index" item="applicableTo" separator="or" open="(" close=")">
+                FIND_IN_SET(#{applicableTo}, te.applicable_to) != 0
+            </foreach>
+        </if>
+        order by a.text asc
+    </select>
+    <select id="relatedSearch"  resultType="com.yudao.lianying.v1.term.dto.EntrySearchResult">
+        select tel.entry_id 'entryId', a.text 'content' from term_item a
+        left join term_entry_lang tel on tel.id=a.term_entry_lang_id
+        where a.status='T'
+        <if test="tags.size() > 0">
+            and
+            <foreach collection="tags" index="index" item="tag" separator="or" open="(" close=")">
+                FIND_IN_SET(#{tag}, a.tag) != 0
+            </foreach>
+        </if>
+    </select>
+
+    <delete id="deleteByEntryIdList">
+        delete  a.* from  term_item a
+        left join term_entry_lang tel on a.term_entry_lang_id=tel.id
+        left join term_entry te on tel.entry_id =te.id
+        where te.id in
+        <foreach collection="entryIdList" index="index" item="id" separator="," open="(" close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+</mapper>
