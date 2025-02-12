@@ -1,0 +1,12 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+
+<input th:value="${jumpUrl}" type="text" id="jumpUrl" hidden>
+<script type='text/javascript'>window.location.href = document.getElementById("jumpUrl").value;</script>
+
+</body>
+</html>

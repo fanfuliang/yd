@@ -1,0 +1,45 @@
+server:
+  port: 8086
+
+
+eureka:
+  instance:
+    hostname: localhost
+#    hostname: 192.168.0.146
+    prefer-ip-address: true
+    instance-id: ${spring.cloud.client.ip-address}:${server.port}
+    ##续约更新时间间隔设置5秒，m默认30s
+    lease-renewal-interval-in-seconds: 5
+    ##续约到期时间10秒，默认是90秒
+    lease-expiration-duration-in-seconds: 10
+  client:
+    service-url:
+      defaultZone: http://${eureka.instance.hostname}:8888/eureka/
+
+# 沙箱账号
+pay:
+  alipay:
+    ip: 192.168.0.127
+    gatewayUrl: https://openapi.alipaydev.com/gateway.do
+    appid: 2016101900721780
+    appPrivateKey: MIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQCOT2ZZWuN1iPQvUgWhOiz+98w2vIVLqSkaci3bLyHjfvk+yvxfsxYMlVE0kBgEdqvYxuLgvkPcAdxDmr9a4tXAtKe6qH63Acn0sLv4cQpfGTh7XkjoltCrFs0fNL4j/OWDYtnCSPx0P0TUxUqZ9OA81OAlxzM2jh2BgU87L9fWP+9WSxNMCDAvVntszQyI3dBYwp/RZgD93KEo9ORoXYhcjqetRjdIwgoDWZvUQRp1FVX9C8moRsiI1fVEybqmSoArzfZ3QU6ClHCS7EYJcdBI8pvzaJxiNYEouIcMfsjuz1WoRfVDCA2ZIdhfSvFtCQ4kCccltt2aXAofmnhExfG5AgMBAAECggEAD2J8ERrnTjSRGXCHlUeBx8qoNB6rVmOiQu6nEHQG+N4oOead5AarUo7t6X3OauUdbOELc/p9wZId6t0W5M9zBlNBcsd2c3hpCd/1YkVuNpu2ZHfr7+EmC+j6Ie6Ew8U6VrrgCcX0LOkOGuZ9SymS+GCXHt5rJfG1NOPy2dYxQkManyt1orG7FbAifU6DcbNFJ2i5QvM0A7jaZt/OOF0kXOOqBitln3dAduVWIDaGndtHJzbcHH0zxO4jF3zUc5Ve//pkrVob9Cf21xMZTDWvOoyJzHfwlQe3zmNC/D2A/E4r4CnN/SsbjZ/Cywx64BIekSwznhxmYpQFEuYLC7gWZQKBgQD1DqlWV2sV5D9tW1eKQM6VbH5Gzn6OwlHDdA9Or6YT+EmE3JK2Q77yHu2pVEfdWU82i8tM2eAFdAqp1SYgF5jgUprsY0GHDcbIKkFGaDfptBQ3G/+tSCJhnpGBnx05paVPqQ5FU4NuPDJ2LUtx8wbGK053DpGf7+YvTOpz3nZaXwKBgQCUqjLj3Wc8o+6wNzex5Yk4JvysINdeU4DREe5TVvbzG5s1CDjODzS9/STD3m/eUZRLpqfQsZej5Nl1OBHiA0zmzOZqF4MAgAsn4i8xzpLFcH3VuDyiLS2UBw+Ff90EU5CPuPy2lcLRIJ5Jakhqm69MJwaoNOsMonXeCrBhaeta5wKBgCVXAJJ5a4XAa7G8E1Cro069Y1hiqoISNec0TgjNVt8AHCO0gF5pYDUAZXJBt1mQ/DLxhh7FrA7oqZ9LLS4Cqnaz34tZbGipvrpNRfj2dF6V4+apy4GZ1jNNuBoqJofcJ55FwjjqCsLHRWEgcbiBMW0MuD4H6ESYh1h5vde99Aa9AoGAVynnRpS0h+hx9R2a6RH0v1iUgvOKcsKw32QNAQ4XInjIKnLUo3Rk7xPyL2lG2+mm8igXcpP9ndl66nBig8p9l0EBw6hfZbatU8gY9bHxehO3o8wuuMOWWpk9L3/FfVjlhG7otMDgBa+DPvYy2VbIk/S5wXutaK4EP5iyy5rHpHcCgYAHZ5UG+6/XwNPRO0GDLka6nNxxBv4CdNS6BhwyjdlKWxNzKQX5YwRdgz+q6etnjoC6luctGsfo6LY5/ONpmH+lAgfAk3Vu0XsIU8W+O9RFD72PyCA6WvXx431coqP7aaC3aFg0G2gJ6HOyfOOMp3Ntmt6jkdtpCIoCDpPXBzUzYw==
+    alipayPublicKey: MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAjmy8yrozF3BogDe5WuEzqzuXVcE/a2Kqfny1tDcD7VBnj9ZJqiPNv9hfhEa4yuVUuu8Sf1cUPmsNjiiltEhWErh1HVcHyXUMwv3q9LrOTijgujhDp0v613Q2wq3pgd883GevQL1N7w6IRWBX/l2bSNA2ulE9APcqKUlxZNb1sO2tSIBe3LgrauWzqyWhlwCXpkphaJck018dgNwoa4g6iwC3P3/3TbE45A7N2w9fH8NycBPK9aHjGFHP9NH1hjXIOjml+p23Roq8UisLoSYk5P9G2u9AQC/ajZzIilNk2WhCwqOpHXtWkt6RmODPrJXtngAE5lOG33i7P41cuAPnAQIDAQAB
+    returnUrl: http://${pay.alipay.ip}:${server.port}/alipay/page/returnUrl
+    notifyUrl: http://rdc.yudaotec.com:${server.port}/alipay/page/notify
+#  wxpay:
+#       appID: wxab8acb865bb1637e
+#       mchID: 11473623
+#       key: 2ab9071b06b9f739b950ddb41db2690d
+#       sandboxKey: 3639bc1370e105aa65f10cd4fef2a3ef
+#       certPath: /var/local/cert/apiclient_cert.p12
+#       notifyUrl: http://192.168.0.112:8086/wxpay/refund/notify
+#       useSandbox: true
+spring:
+  thymeleaf:
+    prefix: classpath:/templates/
+    suffix: .html
+    mode: HTML5
+    encoding: UTF-8
+  application:
+    name: yudao-pay
+

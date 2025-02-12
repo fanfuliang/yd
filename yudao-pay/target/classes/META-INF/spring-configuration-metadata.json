@@ -1,0 +1,169 @@
+{
+  "hints": [],
+  "groups": [
+    {
+      "sourceType": "com.pay.yudaopay.configuration.AlipayProperties",
+      "name": "pay.alipay",
+      "type": "com.pay.yudaopay.configuration.AlipayProperties"
+    },
+    {
+      "sourceType": "com.pay.yudaopay.configuration.MyWXPayConfig",
+      "name": "pay.wxpay",
+      "type": "com.pay.yudaopay.configuration.MyWXPayConfig"
+    }
+  ],
+  "properties": [
+    {
+      "sourceType": "com.pay.yudaopay.configuration.AlipayProperties",
+      "name": "pay.alipay.alipay-public-key",
+      "description": "鏀粯瀹漅SA鍏挜锛岀敤浜庨獙绛炬敮浠樺疂搴旂瓟",
+      "type": "java.lang.String"
+    },
+    {
+      "sourceType": "com.pay.yudaopay.configuration.AlipayProperties",
+      "name": "pay.alipay.app-private-key",
+      "description": "RSA绉侀挜锛岀敤浜庡鍟嗘埛璇锋眰鎶ユ枃鍔犵",
+      "type": "java.lang.String"
+    },
+    {
+      "sourceType": "com.pay.yudaopay.configuration.AlipayProperties",
+      "name": "pay.alipay.appid",
+      "description": "鍟嗘埛搴旂敤id",
+      "type": "java.lang.String"
+    },
+    {
+      "sourceType": "com.pay.yudaopay.configuration.AlipayProperties",
+      "defaultValue": 3000,
+      "name": "pay.alipay.cancel-duration",
+      "description": "鎾ら攢闂撮殧锛堟绉掞級",
+      "type": "java.lang.Long"
+    },
+    {
+      "sourceType": "com.pay.yudaopay.configuration.AlipayProperties",
+      "defaultValue": "UTF-8",
+      "name": "pay.alipay.charset",
+      "description": "缂栫爜",
+      "type": "java.lang.String"
+    },
+    {
+      "sourceType": "com.pay.yudaopay.configuration.AlipayProperties",
+      "defaultValue": "json",
+      "name": "pay.alipay.formate",
+      "description": "鏍煎紡",
+      "type": "java.lang.String"
+    },
+    {
+      "sourceType": "com.pay.yudaopay.configuration.AlipayProperties",
+      "name": "pay.alipay.gateway-url",
+      "description": "鏀粯瀹漡atewayUrl",
+      "type": "java.lang.String"
+    },
+    {
+      "sourceType": "com.pay.yudaopay.configuration.AlipayProperties",
+      "defaultValue": 3,
+      "name": "pay.alipay.max-cancel-retry",
+      "description": "鏈�澶ф挙閿�娆℃暟",
+      "type": "java.lang.Integer"
+    },
+    {
+      "sourceType": "com.pay.yudaopay.configuration.AlipayProperties",
+      "defaultValue": 5,
+      "name": "pay.alipay.max-query-retry",
+      "description": "鏈�澶ф煡璇㈡鏁�",
+      "type": "java.lang.Integer"
+    },
+    {
+      "sourceType": "com.pay.yudaopay.configuration.AlipayProperties",
+      "name": "pay.alipay.notify-url",
+      "description": "寮傛鍦板潃",
+      "type": "java.lang.String"
+    },
+    {
+      "sourceType": "com.pay.yudaopay.configuration.AlipayProperties",
+      "defaultValue": 5000,
+      "name": "pay.alipay.query-duration",
+      "description": "鏌ヨ闂撮殧锛堟绉掞級",
+      "type": "java.lang.Long"
+    },
+    {
+      "sourceType": "com.pay.yudaopay.configuration.AlipayProperties",
+      "name": "pay.alipay.return-url",
+      "description": "鍚屾鍦板潃",
+      "type": "java.lang.String"
+    },
+    {
+      "sourceType": "com.pay.yudaopay.configuration.AlipayProperties",
+      "defaultValue": "RSA2",
+      "name": "pay.alipay.sign-type",
+      "description": "绛惧悕绫诲瀷",
+      "type": "java.lang.String"
+    },
+    {
+      "sourceType": "com.pay.yudaopay.configuration.MyWXPayConfig",
+      "name": "pay.wxpay.app-i-d",
+      "description": "鍏紬璐﹀彿ID",
+      "type": "java.lang.String"
+    },
+    {
+      "sourceType": "com.pay.yudaopay.configuration.MyWXPayConfig",
+      "name": "pay.wxpay.cert-path",
+      "description": "API璇佷功缁濆璺緞",
+      "type": "java.lang.String"
+    },
+    {
+      "sourceType": "com.pay.yudaopay.configuration.MyWXPayConfig",
+      "defaultValue": 8000,
+      "name": "pay.wxpay.http-connect-timeout-ms",
+      "description": "HTTP(S) 杩炴帴瓒呮椂鏃堕棿锛屽崟浣嶆绉�",
+      "type": "java.lang.Integer"
+    },
+    {
+      "sourceType": "com.pay.yudaopay.configuration.MyWXPayConfig",
+      "defaultValue": 10000,
+      "name": "pay.wxpay.http-read-timeout-ms",
+      "description": "HTTP(S) 璇绘暟鎹秴鏃舵椂闂达紝鍗曚綅姣",
+      "type": "java.lang.Integer"
+    },
+    {
+      "sourceType": "com.pay.yudaopay.configuration.MyWXPayConfig",
+      "name": "pay.wxpay.key",
+      "description": "API 瀵嗛挜",
+      "type": "java.lang.String"
+    },
+    {
+      "sourceType": "com.pay.yudaopay.configuration.MyWXPayConfig",
+      "name": "pay.wxpay.mch-i-d",
+      "description": "鍟嗘埛鍙�",
+      "type": "java.lang.String"
+    },
+    {
+      "sourceType": "com.pay.yudaopay.configuration.MyWXPayConfig",
+      "name": "pay.wxpay.notify-url",
+      "description": "閫�娆惧紓姝ラ�氱煡鍦板潃",
+      "type": "java.lang.String"
+    },
+    {
+      "sourceType": "com.pay.yudaopay.configuration.MyWXPayConfig",
+      "name": "pay.wxpay.penetrate-url",
+      "description": "鍩熷悕",
+      "type": "java.lang.String"
+    },
+    {
+      "sourceType": "com.pay.yudaopay.configuration.MyWXPayConfig",
+      "name": "pay.wxpay.sandbox-key",
+      "description": "API 娌欑鐜瀵嗛挜",
+      "type": "java.lang.String"
+    },
+    {
+      "sourceType": "com.pay.yudaopay.configuration.MyWXPayConfig",
+      "name": "pay.wxpay.success-url",
+      "description": "閫�娆惧紓姝ラ�氱煡鍦板潃",
+      "type": "java.lang.String"
+    },
+    {
+      "sourceType": "com.pay.yudaopay.configuration.MyWXPayConfig",
+      "name": "pay.wxpay.use-sandbox",
+      "type": "java.lang.Boolean"
+    }
+  ]
+}
