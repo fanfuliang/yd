@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yudao.lianying.v1.whitelist.dao.mapper.WhitelistMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.yudao.lianying.v1.whitelist.dao.Whitelist">
+        <id column="id" property="id"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="create_by" property="createBy"/>
+        <result column="update_by" property="updateBy"/>
+        <result column="status" property="status"/>
+        <result column="login_name" property="loginName"/>
+        <result column="mobile" property="mobile"/>
+    </resultMap>
+
+
+    <!--字段名要用\$，字段值用#，两个方法都行-->
+    <update id="modifyBatchByIdAuto">
+        <foreach collection="modifyVOList" item="modifyVO" separator=";">
+            update whitelist set
+            <foreach collection="modifyVO.nameList" item="moidfyFieldName" separator="," index="index">
+                ${moidfyFieldName}= #{modifyVO.valueList[${index}]}
+            </foreach>
+            where id = #{modifyVO.id}
+        </foreach>
+    </update>
+
+    <select id="canCheck" resultType="java.lang.Integer">
+        SELECT IF(EXISTS(select 1 from whitelist where login_name=#{1} or mobile=#{1}),1,0)
+    </select>
+
+</mapper>

@@ -1,0 +1,116 @@
+package com.yudao.lianying.v1.searchHistory.api;
+
+
+import com.yudao.common.yudaocommon.annotation.ParameterValidtion;
+import com.yudao.common.yudaocommon.model.Result;
+import com.yudao.lianying.v1.searchHistory.vo.SearchHistoryVO;
+import com.yudao.lianying.v1.searchHistory.vo.SearchHistoryModifyVO1;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+
+import javax.servlet.http.HttpServletResponse;
+import java.util.Date;
+
+/**
+ * <p>
+ * 查询历史表 前端控制器
+ * </p>
+ *
+ * @author liudong
+ * @since 2020-12-12
+ */
+@Api(tags = "查询历史表")
+@RequestMapping(value = "/searchHistory", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+public interface SearchHistoryServiceApi {
+
+    @ApiOperation(value = "保存单条-自动生成")
+    @CrossOrigin(allowCredentials = "true", allowedHeaders = "*", methods = {RequestMethod.POST}, origins = "*")
+    @RequestMapping(value = "/saveAuto", method = {RequestMethod.POST})
+    Result saveAuto(SearchHistoryVO entityVO);
+
+    @ApiOperation(value = "根据id删除，允许传入多个id-自动生成")
+    @CrossOrigin(allowCredentials = "true", allowedHeaders = "*", methods = {RequestMethod.POST}, origins = "*")
+    @RequestMapping(value = "/removeByIdAuto", method = {RequestMethod.POST})
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "ids", value = "查询历史表主键，多个id以逗号分隔", required = true),
+    })
+    Result removeByIdAuto(@ParameterValidtion(notEmpty = true, name = "ids") String ids);
+
+    @ApiOperation(value = "修改对象包含的全部字段-自动生成")
+    @CrossOrigin(allowCredentials = "true", allowedHeaders = "*", methods = {RequestMethod.POST}, origins = "*")
+    @RequestMapping(value = "/modifyAllColumnInObjectAuto", method = {RequestMethod.POST})
+    Result modifyAllColumnInObjectAuto(SearchHistoryModifyVO1 modifyVO1);
+
+    @ApiOperation(value = "根据id修改单条-自动生成", notes = "不适用情况：\n1. 字段修改为空或空串\n2. 字段值里包含逗号\n3. 字段数据类型不是String")
+    @CrossOrigin(allowCredentials = "true", allowedHeaders = "*", methods = {RequestMethod.POST}, origins = "*")
+    @RequestMapping(value = "/modifyByIdAuto", method = {RequestMethod.POST})
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "ids", value = "查询历史表主键，多个id以逗号分隔", required = true),
+            @ApiImplicitParam(name = "modifyFieldNames", value = "修改字段名称，多个以逗号分隔"),
+            @ApiImplicitParam(name = "modifyFieldValues", value = "修改字段值，多个以逗号分隔"),
+    })
+    Result modifyByIdAuto(@ParameterValidtion(notEmpty = true, name = "ids") String ids,
+                          @ParameterValidtion(notEmpty = true, name = "modifyFieldNames") String modifyFieldNames,
+                          @ParameterValidtion(notEmpty = true, name = "modifyFieldValues") String modifyFieldValues);
+
+    @ApiOperation(value = "根据id获取单条-自动生成")
+    @CrossOrigin(allowCredentials = "true", allowedHeaders = "*", methods = {RequestMethod.GET}, origins = "*")
+    @RequestMapping(value = "/getByIdAuto", method = {RequestMethod.GET})
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "id", value = "查询历史表主键", required = true),
+    })
+    Result getByIdAuto(@ParameterValidtion(notEmpty = true, name = "id") String id);
+
+    @ApiOperation(value = "分页查询-自动生成", notes = "不适用情况：\n1. 筛选字段值不能为空或空串，也不能包含逗号或分号\n2. 字段数据类型不是String")
+    @CrossOrigin(allowCredentials = "true", allowedHeaders = "*", methods = {RequestMethod.GET}, origins = "*")
+    @RequestMapping(value = "/pageAuto", method = {RequestMethod.GET})
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "keyword", value = "关键字，查找字段"),
+            @ApiImplicitParam(name = "beginTime", paramType = "query", value = "开始时间，yyyy-MM-dd"),
+            @ApiImplicitParam(name = "endTime", paramType = "query", value = "结束时间，yyyy-MM-dd"),
+            @ApiImplicitParam(name = "filterFieldNames", value = "筛选字段名称，多个以逗号分隔"),
+            @ApiImplicitParam(name = "filterFieldValues", value = "筛选字段值，不同字段的值以分号分隔，同字段的值以逗号分隔"),
+            @ApiImplicitParam(name = "orderBy", value = "排序方式，如：create_time asc"),
+            @ApiImplicitParam(name = "pageNum", value = "页码", required = true),
+            @ApiImplicitParam(name = "pageSize", value = "页面尺寸", required = true),
+    })
+    Result pageAuto(String keyword, Date beginTime, Date endTime, String filterFieldNames, String filterFieldValues, String orderBy,
+                    @ParameterValidtion(gt = 0, name = "pageNum") Integer pageNum,
+                    @ParameterValidtion(gt = 0, name = "pageSize") Integer pageSize);
+
+    @ApiOperation(value = "分页查询-自动生成", notes = "不适用情况：\n1. 筛选字段值不能为空或空串，也不能包含逗号或分号\n2. 字段数据类型不是String")
+    @CrossOrigin(allowCredentials = "true", allowedHeaders = "*", methods = {RequestMethod.GET}, origins = "*")
+    @RequestMapping(value = "/export", method = {RequestMethod.GET})
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "keyword", value = "关键字，查找字段"),
+            @ApiImplicitParam(name = "beginTime", paramType = "query", value = "开始时间，yyyy-MM-dd"),
+            @ApiImplicitParam(name = "endTime", paramType = "query", value = "结束时间，yyyy-MM-dd"),
+            @ApiImplicitParam(name = "filterFieldNames", value = "筛选字段名称，多个以逗号分隔"),
+            @ApiImplicitParam(name = "filterFieldValues", value = "筛选字段值，不同字段的值以分号分隔，同字段的值以逗号分隔"),
+            @ApiImplicitParam(name = "orderBy", value = "排序方式，如：create_time asc"),
+    })
+    Result export(String keyword, Date beginTime, Date endTime, String filterFieldNames, String filterFieldValues, String orderBy, HttpServletResponse response);
+
+    @ApiOperation(value = "获取使用过服务的用户")
+    @CrossOrigin(allowCredentials = "true", allowedHeaders = "*", methods = {RequestMethod.GET}, origins = "*")
+    @RequestMapping(value = "/getAccount", method = {RequestMethod.GET})
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "category", value = "类型"),
+    })
+    Result getAccount(String category);
+
+    @ApiOperation(value = "清空用户搜索历史")
+    @CrossOrigin(allowCredentials = "true", allowedHeaders = "*", methods = {RequestMethod.POST}, origins = "*")
+    @RequestMapping(value = "/clearTermSearchHistory", method = {RequestMethod.POST})
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "account", value = "用户", required = true),
+    })
+    Result clearTermSearchHistory(@ParameterValidtion(notEmpty = true, name = "account") String account);
+}
+

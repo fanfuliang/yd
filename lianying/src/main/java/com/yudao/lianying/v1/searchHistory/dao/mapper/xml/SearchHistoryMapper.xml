@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yudao.lianying.v1.searchHistory.dao.mapper.SearchHistoryMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.yudao.lianying.v1.searchHistory.dao.SearchHistory">
+        <id column="id" property="id"/>
+        <result column="create_time" property="createTime"/>
+        <result column="create_by" property="createBy"/>
+        <result column="field" property="field"/>
+        <result column="applicable_to" property="applicableTo"/>
+        <result column="text" property="text"/>
+        <result column="result_num" property="resultNum"/>
+    </resultMap>
+
+
+    <!--字段名要用\$，字段值用#，两个方法都行-->
+    <update id="modifyByIdAuto">
+        update search_history set
+        <foreach collection="modifyFieldNameArray" item="moidfyFieldName" separator="," index="index">
+            ${moidfyFieldName}= #{modifyFieldValueArray[${index}]}
+        </foreach>
+        where id in
+        <foreach collection="idList" index="index" item="id" separator="," open="(" close=")">
+            #{id}
+        </foreach>
+    </update>
+
+    <select id="getAccount" resultType="java.lang.Object">
+        select distinct create_by name from search_history
+        <if test="category != ''">
+            where category = #{category}
+        </if>
+    </select>
+
+</mapper>
