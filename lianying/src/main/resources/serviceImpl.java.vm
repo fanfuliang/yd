@@ -1,0 +1,140 @@
+#set($bizName=${table.serviceName.substring(0,1).toLowerCase().concat(${table.serviceName.substring(1)})})
+package ${package.ServiceImpl};
+
+##import ${package.Entity}.${entity};
+import com.baomidou.mybatisplus.plugins.Page;
+import com.yudao.common.yudaocommon.enums.ResultEnum;
+import com.yudao.common.yudaocommon.exception.YudaoException;
+import com.yudao.common.yudaocommon.model.Result;
+import com.yudao.common.yudaocommon.utils.CommonUtils;
+import com.yudao.common.yudaocommon.utils.DateUtils;
+import com.yudao.common.yudaocommon.utils.ParameterValidUtils;
+import com.yudao.common.yudaocommon.utils.ResultUtil;
+##import ${package.Mapper}.${table.mapperName};
+import ${package.Controller}.${table.controllerName};
+import ${package.Service}.${table.serviceName};
+import ${package.Controller.replaceAll("v1.*", "utils")}.ModifyVO;
+import ${package.Controller.replace(".api", ".vo")}.${entity}VO;
+import ${package.Controller.replace(".api", ".vo")}.${entity}ModifyVO1;
+##import ${superServiceImplClassPackage};
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Date;
+import java.util.List;
+
+/**
+ * <p>
+ * $!{table.comment} 服务实现类
+ * </p>
+ *
+ * @author ${author}
+ * @since ${date}
+ */
+@RestController
+@Slf4j
+#if(${kotlin})
+open class ${table.serviceImplName} : ${superServiceImplClass}<${table.mapperName}, ${entity}>(), ${table.serviceName} {
+
+}
+#else
+public class ${table.serviceImplName} implements ${table.controllerName} {
+    @Autowired
+    private ${table.serviceName} ${bizName};
+
+    @Override
+    public Result saveAuto(${entity}VO entityVO) {
+        try {
+            return ResultUtil.success(${bizName}.saveAuto(entityVO));
+        } catch (YudaoException e) {
+            log.error("", e);
+            return ResultUtil.error(e);
+        } catch (Exception e) {
+            log.error("", e);
+            return ResultUtil.error(ResultEnum.SERVER_ERROR);
+        }
+    }
+
+    @Override
+    public Result removeByIdAuto(String ids) {
+        try {
+            ${bizName}.removeByIdAuto(ids);
+            return ResultUtil.success();
+        } catch (YudaoException e) {
+            log.error("", e);
+            return ResultUtil.error(e);
+        } catch (Exception e) {
+            log.error("", e);
+            return ResultUtil.error(ResultEnum.SERVER_ERROR);
+        }
+    }
+
+    @Override
+    public Result modifyAllColumnInObjectAuto(${entity}ModifyVO1 modifyVO1) {
+        try {
+            ${bizName}.modifyAllColumnInObjectAuto(modifyVO1);
+            return ResultUtil.success();
+        } catch (YudaoException e) {
+            log.error("", e);
+            return ResultUtil.error(e);
+        } catch (Exception e) {
+            log.error("", e);
+            return ResultUtil.error(ResultEnum.SERVER_ERROR);
+        }
+    }
+
+    @Override
+    public Result modifyBatchByIdAuto(@RequestBody List<ModifyVO> modifyVOList) {
+        try {
+            ${bizName}.modifyBatchByIdAuto(modifyVOList);
+            return ResultUtil.success();
+        } catch (YudaoException e) {
+            log.error("", e);
+            return ResultUtil.error(e);
+        } catch (Exception e) {
+            log.error("", e);
+            return ResultUtil.error(ResultEnum.SERVER_ERROR);
+        }
+    }
+
+    @Override
+    public Result getByIdAuto(String id) {
+        try {
+            return ResultUtil.success(${bizName}.getByIdAuto(id));
+        } catch (YudaoException e) {
+            log.error("", e);
+            return ResultUtil.error(e);
+        } catch (Exception e) {
+            log.error("", e);
+            return ResultUtil.error(ResultEnum.SERVER_ERROR);
+        }
+    }
+
+    @Override
+    public Result pageAuto(String searchFieldNames, String keyword, @DateTimeFormat(pattern = "yyyy-MM-dd") Date beginTime, @DateTimeFormat(pattern = "yyyy-MM-dd") Date endTime, String filterFieldNames, String filterFieldValues, String orderBy, Integer pageNum, Integer pageSize) {
+        try {
+            if (StringUtils.isNotBlank(keyword) && StringUtils.isBlank(searchFieldNames)) {
+                throw new YudaoException(Result.ERROR, "No search field name");
+            }
+            String[] filterFieldNameArray = CommonUtils.splitToArray(filterFieldNames, ",");
+            String[] filterFieldValueArray = CommonUtils.splitToArray(CommonUtils.formatSeparatedStr(filterFieldValues, ","), ";");
+            if (filterFieldNameArray.length != filterFieldValueArray.length) {
+                throw new YudaoException(Result.ERROR, "The number of field names and field values is different");
+            }
+            ParameterValidUtils.beginTimeBeforeEqualsEndTime(beginTime, endTime);
+            endTime = DateUtils.tomorrowStartDate(endTime);
+            return ResultUtil.success(${bizName}.pageAuto(new Page<>(pageNum, pageSize), searchFieldNames, keyword, beginTime, endTime, filterFieldNameArray, filterFieldValueArray, orderBy));
+        } catch (YudaoException e) {
+            log.error("", e);
+            return ResultUtil.error(e);
+        } catch (Exception e) {
+            log.error("", e);
+            return ResultUtil.error(ResultEnum.SERVER_ERROR);
+        }
+    }
+}
+#end

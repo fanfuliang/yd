@@ -1,0 +1,9 @@
+{
+  "notCertification": [
+    "/doc.html",
+    "/swagger-resources"
+    /*,"/**"*/
+    ,"/accounts/**"
+    ,"/v2/**"
+  ]
+}

@@ -1,0 +1,202 @@
+package ${package.Entity};
+
+#foreach($pkg in ${table.importPackages})
+import ${pkg};
+#end
+#if(${entityLombokModel})
+import lombok.Data;
+import lombok.ToString;
+#end
+import javax.persistence.*;
+import io.swagger.annotations.*;
+import java.util.Date;
+
+/**
+ * <p>
+ * $!{table.comment}
+ * </p>
+ *
+ * @author ${author}
+ * @since ${date}
+ */
+#if(${entityLombokModel})
+@Entity
+@Data
+@ToString
+@Table(name = "${table.name}")
+@TableName("${table.name}")
+#if(${superEntityClass})
+@EqualsAndHashCode(callSuper = true)
+#end
+#end
+#if(${table.convert})
+##@TableName("${table.name}")
+#end
+#if(${superEntityClass})
+public class ${entity} extends ${superEntityClass}#if(${activeRecord})<${entity}>#end {
+#elseif(${activeRecord})
+public class ${entity} extends Model<${entity}> {
+#else
+public class ${entity} implements Serializable {
+#end
+
+    private static final long serialVersionUID = 1L;
+
+    /**
+    * 主键
+    */
+    @TableId(value = "id")
+    @ApiModelProperty(value = "主键")
+    @Id
+    @Column(columnDefinition = "varchar(36) COLLATE utf8_bin NOT NULL COMMENT '主键'")
+    private String id;
+    /**
+     * 创建时间
+     */
+    @TableField(value = "create_time")
+    @Column(name = "create_time", columnDefinition = "datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间'")
+    @ApiModelProperty("创建时间")
+    private Date createTime;
+    /**
+     * 更新时间
+     */
+    @TableField(value = "update_time")
+    @Column(name = "update_time", columnDefinition = "datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间'")
+    @ApiModelProperty("更新时间")
+    private Date updateTime;
+    /**
+     * 创建人
+     */
+    @TableField(value = "create_by")
+    @Column(name = "create_by", columnDefinition = "varchar(36) DEFAULT NULL COMMENT '创建人id'")
+    @ApiModelProperty("创建人id")
+    private String createBy;
+    /**
+     * 更新人
+     */
+    @TableField(value = "update_by")
+    @Column(name = "update_by", columnDefinition = "varchar(36) DEFAULT NULL COMMENT '更新人id'")
+    @ApiModelProperty("更新人id")
+    private String updateBy;
+    /**
+     * 状态
+     */
+    @TableField(value = "status")
+    @Column(columnDefinition = "varchar(2) DEFAULT 'T' COMMENT '状态 T正常 D删除'")
+    @ApiModelProperty("状态")
+    private String status;
+
+## ----------  BEGIN 字段循环遍历  ----------
+#foreach($field in ${table.fields})
+#if(${field.name}!="id" && ${field.name}!="create_time" && ${field.name}!="create_by" && ${field.name}!="update_time" && ${field.name}!="update_by" && ${field.name}!="status")
+#if(${field.keyFlag})
+#set($keyPropertyName=${field.propertyName})
+#end
+#if("$!field.comment" != "")
+##    /**
+##     * ${field.comment}
+##     */
+#end
+#if(${field.keyFlag})
+## 主键
+#if(${field.keyIdentityFlag})
+
+#elseif(!$null.isNull(${idType}) && "$!idType" != "")
+    @Id
+    @TableId(value = "${field.name}")
+    @ApiModelProperty("${field.name}")
+#elseif(${field.convert})
+
+#end
+
+## 普通字段
+#elseif(${field.fill})
+## -----   存在字段填充设置   -----
+#if(${field.convert})
+    @TableField(value = "${field.name}", fill = FieldFill.${field.fill})
+#else
+    @TableField(fill = FieldFill.${field.fill})
+#end
+#elseif(${field.convert})
+    @TableField("${field.name}")
+    @Column(columnDefinition = "")
+    @ApiModelProperty("${field.comment}")
+#end
+## 乐观锁注解
+#if(${versionFieldName}==${field.name})
+    @Version
+#end
+## 逻辑删除注解
+#if(${logicDeleteFieldName}==${field.name})
+    @TableLogic
+#end
+    private ${field.propertyType} ${field.propertyName};
+
+#end
+#end
+## ----------  END 字段循环遍历  ----------
+
+#if(!${entityLombokModel})
+#foreach($field in ${table.fields})
+#if(${field.propertyType.equals("boolean")})
+#set($getprefix="is")
+#else
+#set($getprefix="get")
+#end
+
+    public ${field.propertyType} ${getprefix}${field.capitalName}() {
+        return ${field.propertyName};
+    }
+
+#if(${entityBuilderModel})
+    public ${entity} set${field.capitalName}(${field.propertyType} ${field.propertyName}) {
+#else
+    public void set${field.capitalName}(${field.propertyType} ${field.propertyName}) {
+#end
+        this.${field.propertyName} = ${field.propertyName};
+#if(${entityBuilderModel})
+        return this;
+#end
+    }
+#end
+#end
+
+#if(${entityColumnConstant})
+#foreach($field in ${table.fields})
+    public static final String ${field.name.toUpperCase()} = "${field.name}";
+
+#end
+#end
+#if(${activeRecord})
+    @Override
+    protected Serializable pkVal() {
+#if(${keyPropertyName})
+        return this.${keyPropertyName};
+#else
+        return this.id;
+#end
+    }
+
+#end
+#if(!${entityLombokModel})
+    @Override
+    public String toString() {
+        return "${entity}{" +
+#foreach($field in ${table.fields})
+#if($!{velocityCount}==1)
+        "${field.propertyName}=" + ${field.propertyName} +
+#else
+        ", ${field.propertyName}=" + ${field.propertyName} +
+#end
+#end
+        "}";
+    }
+#end
+    public ${entity}(String id, String statusValue) {
+        this.id = id;
+        this.status = statusValue;
+    }
+
+    public ${entity}() {
+    }
+}

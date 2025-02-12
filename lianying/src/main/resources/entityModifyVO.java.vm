@@ -1,0 +1,143 @@
+## ----------  设置全局变量  ----------
+#set($className=${entity.concat("ModifyVO1")})
+## ------------------------------------
+package ${package.Service};
+
+#foreach($pkg in ${table.importPackages})
+import ${pkg};
+#end
+#if(${entityLombokModel})
+import lombok.Data;
+import lombok.ToString;
+#end
+import io.swagger.annotations.*;
+import java.io.Serializable;
+
+/**
+ * <p>
+ * $!{table.comment}
+ * </p>
+ *
+ * @author ${author}
+ * @since ${date}
+ */
+#if(${entityLombokModel})
+@Data
+@ToString
+#if(${superEntityClass})
+@EqualsAndHashCode(callSuper = true)
+#end
+#end
+#if(${table.convert})
+##@TableName("${table.name}")
+#end
+public class ${className} implements Serializable {
+    private static final long serialVersionUID = 1L;
+
+    @ApiModelProperty(value = "主键id")
+    private String id;
+
+    @ApiModelProperty(value = "修改人id")
+    private String updateBy;
+## ----------  BEGIN 字段循环遍历  ----------
+#foreach($field in ${table.fields})
+#if(${field.name}!="id" && ${field.name}!="create_time" && ${field.name}!="create_by" && ${field.name}!="update_time" && ${field.name}!="update_by" && ${field.name}!="status")
+#if(${field.keyFlag})
+#set($keyPropertyName=${field.propertyName})
+#end
+#if("$!field.comment" != "")
+##    /**
+##     * ${field.comment}
+##     */
+#end
+#if(${field.keyFlag})
+## 主键
+#if(${field.keyIdentityFlag})
+
+#elseif(!$null.isNull(${idType}) && "$!idType" != "")
+    @ApiModelProperty(value = "${field.name}")
+#elseif(${field.convert})
+
+#end
+
+## 普通字段
+#elseif(${field.fill})
+## -----   存在字段填充设置   -----
+#if(${field.convert})
+    @TableField(value = "${field.name}", fill = FieldFill.${field.fill})
+#else
+    @TableField(fill = FieldFill.${field.fill})
+#end
+#elseif(${field.convert})
+    @ApiModelProperty(value = "${field.comment}")
+#end
+## 乐观锁注解
+#if(${versionFieldName}==${field.name})
+    @Version
+#end
+## 逻辑删除注解
+#if(${logicDeleteFieldName}==${field.name})
+    @TableLogic
+#end
+    private ${field.propertyType} ${field.propertyName};
+#end
+#end
+## ----------  END 字段循环遍历  ----------
+
+#if(!${entityLombokModel})
+#foreach($field in ${table.fields})
+#if(${field.propertyType.equals("boolean")})
+#set($getprefix="is")
+#else
+#set($getprefix="get")
+#end
+
+    public ${field.propertyType} ${getprefix}${field.capitalName}() {
+        return ${field.propertyName};
+    }
+
+#if(${entityBuilderModel})
+    public ${entity} set${field.capitalName}(${field.propertyType} ${field.propertyName}) {
+#else
+    public void set${field.capitalName}(${field.propertyType} ${field.propertyName}) {
+#end
+        this.${field.propertyName} = ${field.propertyName};
+#if(${entityBuilderModel})
+        return this;
+#end
+    }
+#end
+#end
+
+#if(${entityColumnConstant})
+#foreach($field in ${table.fields})
+    public static final String ${field.name.toUpperCase()} = "${field.name}";
+
+#end
+#end
+#if(${activeRecord})
+    @Override
+    protected Serializable pkVal() {
+#if(${keyPropertyName})
+        return this.${keyPropertyName};
+#else
+        return this.id;
+#end
+    }
+
+#end
+#if(!${entityLombokModel})
+    @Override
+    public String toString() {
+        return "${entity}{" +
+#foreach($field in ${table.fields})
+#if($!{velocityCount}==1)
+        "${field.propertyName}=" + ${field.propertyName} +
+#else
+        ", ${field.propertyName}=" + ${field.propertyName} +
+#end
+#end
+        "}";
+    }
+#end
+}

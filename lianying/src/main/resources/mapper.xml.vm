@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="${package.Mapper}.${table.mapperName}">
+
+#if(${enableCache})
+    <!-- 开启二级缓存 -->
+    <cache type="org.mybatis.caches.ehcache.LoggingEhcache"/>
+#end
+#if(${baseResultMap})
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="${package.Entity}.${entity}">
+        <id column="id" property="id"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="create_by" property="createBy"/>
+        <result column="update_by" property="updateBy"/>
+        <result column="status" property="status"/>
+###foreach($field in ${table.fields})
+###if(${field.keyFlag})##生成主键排在第一位
+##        <id column="${field.name}" property="${field.propertyName}"/>
+###end
+###end
+###foreach($field in ${table.commonFields})##生成公共字段
+##    <result column="${field.name}" property="${field.propertyName}"/>
+###end
+#foreach($field in ${table.fields})
+#if(${field.name}!="id" && ${field.name}!="create_time" && ${field.name}!="create_by" && ${field.name}!="update_time" && ${field.name}!="update_by" && ${field.name}!="status")
+    #if(!${field.keyFlag})##生成普通字段
+        <result column="${field.name}" property="${field.propertyName}"/>
+    #end
+#end
+#end
+    </resultMap>
+
+#end
+###if(${baseColumnList})
+##    <!-- 通用查询结果列 -->
+##    <sql id="Base_Column_List">
+##        id, create_time, update_time, create_by, update_by, status,
+##        #foreach($field in ${table.commonFields})
+##            #if(${field.name} == ${field.propertyName})${field.name}#else${field.name} AS ${field.propertyName}#end
+##        #end
+##              ${table.fieldNames}
+##    </sql>
+##
+###end
+
+    <!--字段名要用\$，字段值用#，两个方法都行-->
+    <update id="modifyBatchByIdAuto">
+        <foreach collection="modifyVOList" item="modifyVO" separator=";">
+            update ${table.name} set
+            <foreach collection="modifyVO.nameList" item="moidfyFieldName" separator="," index="index">
+                ${moidfyFieldName}= #{modifyVO.valueList[${index}]}
+            </foreach>
+            where id = #{modifyVO.id}
+        </foreach>
+    </update>
+##    <!--<update id="modifyByIdAuto">
+##        update ${table.name} set
+##        <foreach collection="modifyFieldValueArray" item="moidfyFieldValue" separator="," index="index">
+##              ${modifyFieldNameArray[index]}= #{moidfyFieldValue}
+##              上面的代码一直报异常，org.apache.velocity.exception.ParseErrorException: Lexical error,   Encountered: "i" (105), after : "" at mapper.xml.vm[line 61, column 38]
+##        </foreach>
+##        where id = #{id}
+##    </update>-->
+
+</mapper>
