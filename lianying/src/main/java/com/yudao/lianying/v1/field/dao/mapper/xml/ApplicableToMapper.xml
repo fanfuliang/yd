@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yudao.lianying.v1.field.dao.mapper.ApplicableToMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.yudao.lianying.v1.field.dao.ApplicableTo">
+        <id column="id" property="id"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="create_by" property="createBy"/>
+        <result column="update_by" property="updateBy"/>
+        <result column="status" property="status"/>
+        <result column="name" property="name"/>
+        <result column="remark" property="remark"/>
+    </resultMap>
+
+
+    <!--字段名要用\$，字段值用#，两个方法都行-->
+    <update id="modifyByIdAuto">
+        update applicable_to set
+        <foreach collection="modifyFieldNameArray" item="moidfyFieldName" separator="," index="index">
+            ${moidfyFieldName}= #{modifyFieldValueArray[${index}]}
+        </foreach>
+        where id in
+        <foreach collection="idList" index="index" item="id" separator="," open="(" close=")">
+            #{id}
+        </foreach>
+    </update>
+
+    <select id="selectAllNameList" resultType="string">
+        select a.name 'name' from applicable_to a where a.status='T'
+    </select>
+
+
+</mapper>

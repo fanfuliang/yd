@@ -1,0 +1,353 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yudao.lianying.v1.process.dao.mapper.ProcessMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.yudao.lianying.v1.process.dao.Process">
+        <id column="id" property="id"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="create_by" property="createBy"/>
+        <result column="update_by" property="updateBy"/>
+        <result column="status" property="status"/>
+        <result column="entry_id" property="entryId"/>
+        <result column="type" property="type"/>
+        <result column="state" property="state"/>
+        <result column="suggestion" property="suggestion"/>
+        <result column="field" property="field"/>
+        <result column="field_name" property="fieldName"/>
+        <result column="term_text" property="termText"/>
+        <result column="language" property="language"/>
+        <result column="comment_id" property="commentId"/>
+        <result column="comment_text" property="commentText"/>
+        <result column="remark" property="remark"/>
+        <result column="readed" property="readed"/>
+    </resultMap>
+
+    <!--字段名要用\$，字段值用#，两个方法都行-->
+    <update id="modifyByIdAuto">
+        update process set
+        <foreach collection="modifyFieldNameArray" item="moidfyFieldName" separator="," index="index">
+            ${moidfyFieldName}= #{modifyFieldValueArray[${index}]}
+        </foreach>
+        where id in
+        <foreach collection="idList" index="index" item="id" separator="," open="(" close=")">
+            #{id}
+        </foreach>
+    </update>
+
+    <select id="pageMySubmittedTerms" resultType="map">
+        select a.id, a.create_time createTime, a.entry_id entryId, a.field,a.field_name 'fieldName',a.term_text termText, a.state, a.readed,
+        b.create_by managerId, c.login_name managerName,b.suggestion
+        from process a
+        left join process b on  b.parent_id =a.id
+        left join account c on b.create_by = c.id
+        where a.type = 'term'
+        and a.create_by = #{account} and (a.parent_id is null or a.parent_id = '')
+        <if test="keyword != ''">
+            and a.term_text like '%${keyword}%'
+        </if>
+        <if test="fieldList.size() > 0">
+            and
+            <foreach collection="fieldList" index="index" item="field" separator="or" open="(" close=")">
+                FIND_IN_SET(#{field}, a.field) != 0
+            </foreach>
+        </if>
+        <if test="beginTime != null">
+            and a.create_time &gt;= #{beginTime}
+        </if>
+        <if test="endTime != null">
+            and a.create_time &lt; #{endTime}
+        </if>
+        <if test="state != ''">
+            and a.state in (${state})
+        </if>
+        <choose>
+            <when test="orderBy != ''">
+                <!--order by a.create_time asc, a.create_time desc 测试结果为升序-->
+                order by ${orderBy}, a.create_time desc
+            </when>
+            <otherwise>
+                order by a.create_time desc
+            </otherwise>
+        </choose>
+    </select>
+
+    <select id="pageMySubmittedComment" resultType="map">
+        select a.id, a.create_time createTime, a.entry_id entryId, a.comment_id commentId, a.comment_text commentText, a.place place, a.field,a.field_name 'fieldName', a.term_text termText, a.state, a.readed,
+        b.create_by managerId, c.login_name managerName,b.suggestion
+        from process a
+        left join process b on a.id = b.parent_id
+        left join account c on b.create_by = c.id
+        where a.type = 'comment'
+        and a.create_by = #{account} and (a.parent_id is null or a.parent_id = '')
+        <if test="keyword != ''">
+            and (a.term_text like '%${keyword}%' or a.comment_text like '%${keyword}%')
+        </if>
+        <if test="fieldList.size() > 0">
+            and
+            <foreach collection="fieldList" index="index" item="field" separator="or" open="(" close=")">
+                FIND_IN_SET(#{field}, a.field) != 0
+            </foreach>
+        </if>
+        <if test="beginTime != null">
+            and a.create_time &gt;= #{beginTime}
+        </if>
+        <if test="endTime != null">
+            and a.create_time &lt; #{endTime}
+        </if>
+        <if test="place != ''">
+            and a.place in (${place})
+        </if>
+        <if test="state != ''">
+            and a.state in (${state})
+        </if>
+        <choose>
+            <when test="orderBy != ''">
+                <!--order by a.create_time asc, a.create_time desc 测试结果为升序-->
+                order by ${orderBy}, a.create_time desc
+            </when>
+            <otherwise>
+                order by a.create_time desc
+            </otherwise>
+        </choose>
+    </select>
+
+    <select id="pageMyForwardTerms" resultType="map">
+        select a.id, a.create_time createTime, a.entry_id entryId, a.field,a.field_name fieldName, a.term_text termText, a.suggestion, a.state, a.readed,
+        b.create_by managerId, c.login_name managerName, d.create_by creator
+        from process a
+        left join process b on a.parent_id = b.id
+        left join account c on b.create_by = c.id
+        left join process d on b.parent_id = d.id
+        where a.type = 'term'
+        and a.create_by = #{account} and a.parent_id is not null and a.parent_id != ''
+        <if test="keyword != ''">
+            and a.term_text like '%${keyword}%'
+        </if>
+        <if test="fieldList.size() > 0">
+            and
+            <foreach collection="fieldList" index="index" item="field" separator="or" open="(" close=")">
+                FIND_IN_SET(#{field}, a.field) != 0
+            </foreach>
+        </if>
+        <if test="beginTime != null">
+            and a.create_time &gt;= #{beginTime}
+        </if>
+        <if test="endTime != null">
+            and a.create_time &lt; #{endTime}
+        </if>
+        <if test="state != ''">
+            and a.state in (${state})
+        </if>
+        <if test="creator != ''">
+            and d.create_by in (${creator})
+        </if>
+        <choose>
+            <when test="orderBy != ''">
+                <!--order by a.create_time asc, a.create_time desc 测试结果为升序-->
+                order by ${orderBy}, a.create_time desc
+            </when>
+            <otherwise>
+                order by a.create_time desc
+            </otherwise>
+        </choose>
+    </select>
+
+    <select id="pageMyForwardComment" resultType="map">
+        select a.id, a.create_time createTime, a.entry_id entryId, a.comment_id commentId, a.comment_text commentText, a.place place, a.field,a.field_name fieldName, a.term_text termText, a.suggestion, a.state, a.readed,
+        b.create_by managerId, c.login_name managerName, d.create_by creator
+        from process a
+        left join process b on a.parent_id = b.id
+        left join account c on b.create_by = c.id
+        left join process d on b.parent_id = d.id
+        where a.type = 'comment'
+        and a.create_by = #{account} and a.parent_id is not null and a.parent_id != ''
+        <if test="keyword != ''">
+            and a.term_text like '%${keyword}%'
+        </if>
+        <if test="fieldList.size() > 0">
+            and
+            <foreach collection="fieldList" index="index" item="field" separator="or" open="(" close=")">
+                FIND_IN_SET(#{field}, a.field) != 0
+            </foreach>
+        </if>
+        <if test="beginTime != null">
+            and a.create_time &gt;= #{beginTime}
+        </if>
+        <if test="endTime != null">
+            and a.create_time &lt; #{endTime}
+        </if>
+        <if test="place != ''">
+            and a.place in (${place})
+        </if>
+        <if test="state != ''">
+            and a.state in (${state})
+        </if>
+        <if test="creator != ''">
+            and d.create_by in (${creator})
+        </if>
+        <choose>
+            <when test="orderBy != ''">
+                <!--order by a.create_time asc, a.create_time desc 测试结果为升序-->
+                order by ${orderBy}, a.create_time desc
+            </when>
+            <otherwise>
+                order by a.create_time desc
+            </otherwise>
+        </choose>
+    </select>
+
+    <select id="pageManagerTerms" resultType="com.yudao.lianying.v1.process.dto.TermProcessManageDTO">
+    select a.id,a.parent_id parentId, a.create_time createTime,a.update_time updateTime, a.entry_id entryId, a.field,a.field_name fieldName, a.term_text termText, a.state, a.readed,
+    b.create_by creator,a.suggestion suggestion,
+    (select suggestion from process where parent_id = a.id order by create_time desc limit 1) lastestCheck
+    from process a
+    left join process b on a.parent_id = b.id
+    where a.type = 'term'
+    and a.create_by = #{account}
+    <if test="keyword != ''">
+        and a.term_text like '%${keyword}%'
+    </if>
+    <if test="fieldList.size() > 0">
+        and
+        <foreach collection="fieldList" index="index" item="field" separator="or" open="(" close=")">
+            FIND_IN_SET(#{field}, a.field) != 0
+        </foreach>
+    </if>
+    <if test="beginTime != null">
+        and a.create_time &gt;= #{beginTime}
+    </if>
+    <if test="endTime != null">
+        and a.create_time &lt; #{endTime}
+    </if>
+    <if test="state != ''">
+        and a.state in (${state})
+    </if>
+    <if test="creator != ''">
+        and b.create_by in (${creator})
+    </if>
+    <choose>
+        <when test="orderBy != ''">
+            <!--order by a.create_time asc, a.create_time desc 测试结果为升序-->
+            order by ${orderBy}, a.create_time desc
+        </when>
+        <otherwise>
+            order by a.create_time desc
+        </otherwise>
+    </choose>
+</select>
+
+    <select id="getForwardProcessTerm" resultType="com.yudao.lianying.v1.process.dto.TermProcessManageDTO">
+        select a.id,a.parent_id parentId, a.create_time createTime,a.update_time updateTime, a.entry_id entryId, a.field,a.field_name fieldName, a.term_text termText, a.state, a.readed,
+        a.create_by creator,a.suggestion suggestion,
+        (select suggestion from process where parent_id = a.id order by create_time desc limit 1) lastestCheck
+        from process a
+        left join process b on a.parent_id = b.id
+        where a.type = 'term'
+        and a.parent_id in
+        <foreach collection="processIdList" item="processId" open="(" close=")" separator=",">
+            #{processId}
+        </foreach>
+        order by a.create_time desc
+    </select>
+
+    <select id="pageManagerComment" resultType="com.yudao.lianying.v1.process.dto.CommentProcessManageDTO">
+        select a.id,a.parent_id parentId, a.create_time createTime,a.update_time updateTime, a.entry_id entryId, a.comment_id commentId, a.comment_text commentText, a.place place, a.field,a.field_name fieldName, a.term_text termText, a.state, a.readed,
+        b.create_by creator,a.suggestion suggestion,
+        (select suggestion from process where parent_id = a.id order by create_time desc limit 1) lastestCheck
+        from process a
+        left join process b on a.parent_id = b.id
+        where a.type = 'comment'
+        and a.create_by = #{account}
+        <if test="keyword != ''">
+            and (a.term_text like '%${keyword}%' or a.comment_text like '%${keyword}%')
+        </if>
+        <if test="fieldList.size() > 0">
+            and
+            <foreach collection="fieldList" index="index" item="field" separator="or" open="(" close=")">
+                FIND_IN_SET(#{field}, a.field) != 0
+            </foreach>
+        </if>
+        <if test="beginTime != null">
+            and a.create_time &gt;= #{beginTime}
+        </if>
+        <if test="endTime != null">
+            and a.create_time &lt; #{endTime}
+        </if>
+        <if test="place != ''">
+            and a.place in (${place})
+        </if>
+        <if test="state != ''">
+            and a.state in (${state})
+        </if>
+        <if test="creator != ''">
+            and b.create_by in (${creator})
+        </if>
+
+        <choose>
+            <when test="orderBy != ''">
+                <!--order by a.create_time asc, a.create_time desc 测试结果为升序-->
+                order by ${orderBy}, a.create_time desc
+            </when>
+            <otherwise>
+                order by a.create_time desc
+            </otherwise>
+        </choose>
+    </select>
+
+    <select id="getForwardProcessComment" resultType="com.yudao.lianying.v1.process.dto.CommentProcessManageDTO">
+        select a.id,a.parent_id parentId, a.create_time createTime,a.update_time updateTime, a.entry_id entryId, a.comment_id commentId,
+        a.comment_text commentText, a.place place, a.field,a.field_name fieldName, a.term_text termText, a.state, a.readed,
+        a.create_by creator,a.suggestion suggestion,
+        (select suggestion from process where parent_id = a.id order by create_time desc limit 1) lastestCheck
+        from process a
+        left join process b on a.parent_id = b.id
+        where a.type = 'comment'
+        and a.parent_id in
+        <foreach collection="processIdList" item="processId" open="(" close=")" separator=",">
+            #{processId}
+        </foreach>
+        order by a.create_time desc
+    </select>
+
+    <select id="contributeTermList" resultType="map">
+        SELECT * FROM
+        (SELECT a.create_by createBy, COUNT(DISTINCT d.text) num FROM process a
+        LEFT JOIN term_entry b ON a.entry_id = b.id
+        LEFT JOIN term_entry_lang c ON b.id = c.entry_id
+        LEFT JOIN term_item d ON d.term_entry_lang_id = c.id
+        WHERE a.type = 'term' AND (a.parent_id IS NULL OR a.parent_id = '') and a.state = '202012120205' and a.create_by is not null and a.create_by != ''
+        GROUP BY a.create_by) aa
+        ORDER BY num desc
+    </select>
+
+    <select id="getNewTerms" resultType="map">
+        select entry_id entryId, term_text term, update_time time from process
+        where status = 'T' and state = #{state} and parent_id is null and `type` = #{type} order by update_time desc limit ${num}
+    </select>
+    <select id="myUnDealedCommentNum" resultType="Integer">
+        select count(*) from process where create_by = #{account} and state = '202012120201' and readed = 0 and type = 'comment'
+    </select>
+
+    <select id="myUnDealedTermNum" resultType="Integer">
+        select count(*) from process where create_by = #{account} and state = '202012120201' and readed = 0 and type = 'term'
+    </select>
+
+    <select id="getAllCreatorByAccount" resultType="map">
+        select DISTINCT  d.create_by creator
+        from process a
+        left join process b on a.parent_id = b.id
+        left join process d on b.parent_id = d.id
+        where a.type = #{type} and  a.create_by = #{accountId} and a.parent_id is not null and a.parent_id != ''
+    </select>
+
+    <select id="getManagerAllCreator" resultType="map">
+        select DISTINCT b.create_by creator
+        from process a
+        left join process b on a.parent_id = b.id
+        where a.type = #{type}
+        and a.create_by = #{accountId}
+    </select>
+
+</mapper>
