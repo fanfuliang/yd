@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.yudao</groupId>
+    <artifactId>yudao</artifactId>
+    <version>1.0.0</version>
+    <packaging>pom</packaging>   <!--父模块打包类型必须为pom-->
+    <name>yudao主项目</name>
+
+    <!--指定仓库地址-->
+    <distributionManagement>
+        <repository>
+            <id>nexus</id>
+            <name>Nexus Release Repository</name>
+            <url>http://192.168.0.215/repository/maven-releases/</url>
+        </repository>
+        <snapshotRepository>
+            <id>nexus</id>
+            <name>Nexus Snapshot Repository</name>
+            <url>http://192.168.0.215/repository/maven-snapshots/</url>
+        </snapshotRepository>
+    </distributionManagement>
+
+    <!--子模块工厂配置-->
+    <modules>
+        <!--&lt;!&ndash;主要用于服务的注册发现&ndash;&gt;-->
+        <!--<module>yudao-eureka</module>-->
+        <!--&lt;!&ndash;接口&ndash;&gt;-->
+        <!--<module>meeting-api</module>-->
+        <!--&lt;!&ndash;接口的实现&ndash;&gt;-->
+        <!--<module>meeting-compose</module>-->
+        <!--&lt;!&ndash;页面展示&ndash;&gt;-->
+        <!--<module>meeting-web</module>-->
+        <!--&lt;!&ndash;单点登录&ndash;&gt;-->
+        <!--&lt;!&ndash;<module>yudao-sso</module>&ndash;&gt;-->
+        <!--&lt;!&ndash;单点登录&ndash;&gt;-->
+        <!--&lt;!&ndash;<module>yudao-zuul</module>&ndash;&gt;-->
+        <!--&lt;!&ndash;网关&ndash;&gt;-->
+        <!--<module>yudao-gateway</module>-->
+        <!--&lt;!&ndash;监视器&ndash;&gt;-->
+        <!--<module>yudao-monitor</module>-->
+        <!--&lt;!&ndash;认证中心&ndash;&gt;-->
+        <!--<module>yudao-oauth</module>-->
+        <!--&lt;!&ndash;翻译&ndash;&gt;-->
+        <!--<module>translation-compose</module>-->
+        <!--&lt;!&ndash;翻译&ndash;&gt;-->
+        <!--<module>translation-api</module>-->
+        <!--&lt;!&ndash;翻译&ndash;&gt;-->
+        <!--<module>translation-web</module>-->
+        <!--公共类-->
+        <module>yudao-common</module>
+        <module>check</module>
+
+    </modules>
+
+
+    <!--配置参数-->
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <java.version>1.8</java.version>
+        <!--<spring-cloud.version>Dalston.SR1</spring-cloud.version>-->
+        <!--<spring-cloud.version>Greenwich.RELEASE</spring-cloud.version>-->
+        <spring-cloud.version>Edgware.RELEASE</spring-cloud.version>
+        <fastjson-version>1.2.15</fastjson-version>
+        <springfox-swagger2.version>2.9.2</springfox-swagger2.version>
+        <springfox-swagger-ui.version>2.8.0</springfox-swagger-ui.version>
+        <properties.env>application-dev</properties.env>
+        <druid-starter.version>1.1.6</druid-starter.version>
+    </properties>
+
+
+
+
+    <!--Spring Boot配置-->
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <!--<version>2.0.6.RELEASE</version>-->
+        <!--<version>2.1.3.RELEASE</version>-->
+        <!--<version>1.5.2.RELEASE</version>-->
+        <version>1.5.12.RELEASE</version>
+        <relativePath/> <!-- lookup parent from repository -->
+
+    </parent>
+
+
+
+    <dependencies>
+        <!--<dependency>-->
+        <!--<groupId>org.springframework.boot</groupId>-->
+        <!--<artifactId>spring-boot-starter-web</artifactId>-->
+        <!--</dependency>-->
+        <dependency>
+            <groupId>com.sun.jna</groupId>
+            <artifactId>jna</artifactId>
+            <version>3.0.9</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+        </dependency>
+
+        <!--<dependency>-->
+        <!--<groupId>org.springframework.cloud</groupId>-->
+        <!--<artifactId>spring-cloud-starter-security</artifactId>-->
+        <!--</dependency>-->
+
+        <!--<dependency>-->
+        <!--<groupId>org.springframework.boot</groupId>-->
+        <!--<artifactId>spring-boot-starter-data-jpa</artifactId>-->
+        <!--</dependency>-->
+
+        <!--<dependency>-->
+        <!--<groupId>org.springframework.boot</groupId>-->
+        <!--<artifactId>spring-boot-starter-jdbc</artifactId>-->
+        <!--</dependency>-->
+
+
+        <!--<dependency>-->
+        <!--<groupId>com.alibaba</groupId>-->
+        <!--<artifactId>fastjson</artifactId>-->
+        <!--<version>${fastjson-version}</version>-->
+        <!--</dependency>-->
+
+
+        <!--<dependency>-->
+        <!--<groupId>org.projectlombok</groupId>-->
+        <!--<artifactId>lombok</artifactId>-->
+        <!--<optional>true</optional>-->
+        <!--</dependency>-->
+
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-eureka-server</artifactId>
+            <!--<exclusions>-->
+                <!--<exclusion>-->
+                    <!--<groupId>com.fasterxml.jackson.dataformat</groupId>-->
+                    <!--<artifactId>jackson-dataformat-xml</artifactId>-->
+                <!--</exclusion>-->
+            <!--</exclusions>-->
+        </dependency>
+
+
+        <!-- api接口管理  https://www.jianshu.com/p/64c2947e1f48  -->
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-swagger2</artifactId>
+            <version>${springfox-swagger2.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-swagger-ui</artifactId>
+            <version>${springfox-swagger-ui.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.xiaoymin</groupId>
+            <artifactId>swagger-bootstrap-ui</artifactId>
+            <version>1.8.7</version>
+        </dependency>
+        <dependency>
+            <groupId>net.sf.json-lib</groupId>
+            <artifactId>json-lib</artifactId>
+            <version>2.4</version>
+            <classifier>jdk15</classifier>
+        </dependency>
+
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>fastjson</artifactId>
+            <version>${fastjson-version}</version>
+        </dependency>
+
+
+    </dependencies>
+
+
+    <!--Spring Cloud 版本序列配置-->
+    <dependencyManagement>
+
+        <dependencies>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-dependencies</artifactId>
+                <version>${spring-cloud.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>druid-spring-boot-starter</artifactId>
+                <version>${druid-starter.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+
+    <build>
+        <plugins>
+            <!--发布代码Jar插件-->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-deploy-plugin</artifactId>
+                <version>2.7</version>
+            </plugin>
+            <!--发布源码插件-->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>2.2.1</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.1</version>
+                <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                    <encoding>UTF-8</encoding>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
