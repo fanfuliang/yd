@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yudao.lianying.v1.checkConfig.dao.mapper.CheckConfigMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.yudao.lianying.v1.checkConfig.dao.CheckConfig">
+        <id column="id" property="id"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="create_by" property="createBy"/>
+        <result column="update_by" property="updateBy"/>
+        <result column="status" property="status"/>
+        <result column="index_id" property="indexId"/>
+        <result column="enable" property="enable"/>
+        <result column="level" property="level"/>
+        <result column="file_type" property="fileType"/>
+        <result column="rule_type" property="ruleType"/>
+        <result column="lang_type" property="langType"/>
+        <result column="lang" property="lang"/>
+    </resultMap>
+
+    <!--字段名要用\$，字段值用#，两个方法都行-->
+    <update id="modifyByIdAuto">
+        update check_config set
+        <foreach collection="modifyFieldNameArray" item="moidfyFieldName" separator="," index="index">
+            ${moidfyFieldName}= #{modifyFieldValueArray[${index}]}
+        </foreach>
+        where id in
+        <foreach collection="idList" index="index" item="id" separator="," open="(" close=")">
+            #{id}
+        </foreach>
+    </update>
+
+    <select id="getVaildIndexName" resultType="String">
+        select index_name from check_config where status = 'T' and lang = #{lang} and enable = 1
+        <if test="fileType != ''">
+            and FIND_IN_SET(#{fileType}, file_type)
+        </if>
+        <if test="ruleType != ''">
+            and FIND_IN_SET(#{ruleType}, rule_type)
+        </if>
+        <if test="langType != ''">
+            and FIND_IN_SET(#{langType}, lang_type)
+        </if>
+    </select>
+
+</mapper>
